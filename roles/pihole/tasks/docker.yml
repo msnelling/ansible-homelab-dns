@@ -1,0 +1,40 @@
+- name: Docker | create Pi-hole config directories
+  file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+  loop:
+  - /opt/pihole/etc-pihole
+  - /opt/pihole/etc-dnsmasq.d
+
+- name: Docker | create dnsmasq config
+  template:
+    src: 99-local.conf.j2
+    dest: /opt/pihole/etc-dnsmasq.d/99-local.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Docker | start Pi-Hole container
+  docker_container:
+    name: pihole
+    image: pihole/pihole:latest
+    ports: 
+    - '53:53/udp'
+    - '80:80/tcp'
+    volumes:
+    - '/opt/pihole/etc-pihole/:/etc/pihole/'
+    - '/opt/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/'
+    dns_servers:
+    - 127.0.0.1
+    - 8.8.8.8
+    restart_policy: unless-stopped
+    recreate: yes
+    state: started
+  environment:
+    TZ: 'Europe/London'
+    DNS1: "{{ pihole_upstream_dns[0] }}"
+    DNS2: "{{ pihole_upstream_dns[1] }}"
+    WEBPASSWORD: ""

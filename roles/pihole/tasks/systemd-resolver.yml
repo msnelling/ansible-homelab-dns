@@ -1,0 +1,13 @@
+- name: systemd-resolver | disable local resolver
+  lineinfile: 
+    dest: /etc/systemd/resolved.conf
+    regexp: "DNSStubListener"
+    line: "DNSStubListener=no"
+    state: present
+  register: systemd_resolver
+
+- name: systemd-resolver | restart
+  service: 
+    name: systemd-resolver
+    state: restarted
+  when: systemd_resolver.changed

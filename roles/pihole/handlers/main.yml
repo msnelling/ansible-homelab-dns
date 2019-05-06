@@ -1,4 +1,0 @@
-- name: restart lighttpd
-  service:
-    name: lighttpd
-    state: restarted
