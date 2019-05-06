@@ -20,10 +20,10 @@
 - name: Docker | start Pi-Hole container
   docker_container:
     name: pihole
+    hostname: "{{ ansible_hostname }}"
     image: pihole/pihole:latest
     ports: 
     - '53:53/udp'
-    - '80:80/tcp'
     volumes:
     - '/opt/pihole/etc-pihole/:/etc/pihole/'
     - '/opt/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/'
@@ -37,4 +37,4 @@
     TZ: 'Europe/London'
     DNS1: "{{ pihole_upstream_dns[0] }}"
     DNS2: "{{ pihole_upstream_dns[1] }}"
-    WEBPASSWORD: ""
+    VIRTUAL_HOST: "{{ ansible_hostname }}.lan.synchro.dev"
