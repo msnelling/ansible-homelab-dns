@@ -1,0 +1,8 @@
+- import_tasks: ufw.yml
+  tags: [ufw]
+
+- import_tasks: pihole.yml
+  tags: [pihole]
+
+- import_tasks: nginx.yml
+  tags: [nginx]

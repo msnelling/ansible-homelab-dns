@@ -1,0 +1,24 @@
+- name: UFW | copy Pi-Hole application config
+  copy:
+    src: pihole.conf
+    dest: /etc/ufw/applications.d/pihole
+    owner: root
+    group: root
+    mode: 0644
+
+- name: UFW | copy web server application config
+  copy:
+    src: web.conf
+    dest: /etc/ufw/applications.d/web
+    owner: root
+    group: root
+    mode: 0644
+
+- name: UFW | allow applications
+  ufw:
+    rule: allow
+    name: "{{ item }}"
+  loop:
+  - Pi-Hole
+  - Web Server Full
+  

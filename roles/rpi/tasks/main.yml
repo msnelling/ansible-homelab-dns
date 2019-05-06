@@ -1,0 +1,19 @@
+- name: add tmpfs mounts
+  mount:
+    path: "{{ item.path }}"
+    src: tmpfs
+    fstype: tmpfs
+    opts: "{{ item.opts }}"
+    state: present
+  loop:
+  - path: /tmp
+    opts: defaults,noatime,nosuid,size=100m
+  - path: /var/tmp
+    opts: defaults,noatime,nosuid,size=30m
+  - path: /var/log
+    opts: defaults,noatime,nosuid,mode=0755,size=100m
+  - path: /var/run
+    opts: defaults,noatime,nosuid,mode=0755,size=2m
+  - path: /var/spool/mqueue
+    opts: defaults,noatime,nosuid,mode=0700,gid=12,size=30m
+  notify: restart host

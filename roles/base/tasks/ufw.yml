@@ -1,0 +1,10 @@
+- name: UFW | allow ssh
+  ufw:
+    rule: allow
+    name: OpenSSH
+
+- name: UFW | deny everything else and enable UFW
+  ufw:
+    state: enabled
+    direction: incoming
+    policy: reject

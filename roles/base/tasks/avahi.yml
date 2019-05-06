@@ -1,0 +1,10 @@
+- name: Avahi | install packages
+  package:
+    name: avahi-daemon
+    update_cache: yes
+
+- name: Avahi | ensure service is running
+  service:
+    name: avahi-daemon
+    enabled: yes
+    state: started

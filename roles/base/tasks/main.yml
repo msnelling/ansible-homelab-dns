@@ -1,0 +1,14 @@
+- import_tasks: users.yml
+  tags: [users]
+
+- import_tasks: ssh.yml
+  tags: [ssh]
+
+- import_tasks: fail2ban.yml
+  tags: [fail2ban]
+
+- import_tasks: avahi.yml
+  tags: [avahi]
+  
+- import_tasks: ufw.yml
+  tags: [ufw]

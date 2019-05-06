@@ -1,0 +1,26 @@
+- hosts: rpi
+  become: true
+  tasks:
+  - import_role:
+      name: rpi
+    tags: [rpi]
+
+- hosts: all
+  become: true
+  tasks:
+  - import_role:
+      name: base
+    vars:
+      user_groups: sudo
+      user_ssh_authorized_keys: "{{ my_ssh_authorized_keys }}"
+    tags: [base]
+
+- hosts: pihole
+  become: true
+  tasks:
+  - import_role:
+      name: pihole
+    vars:
+      pihole_ipv4_address: "{{ ipv4_address }}"
+      pihole_ipv6_address: "{{ ipv6_address }}"
+    tags: [pihole]
