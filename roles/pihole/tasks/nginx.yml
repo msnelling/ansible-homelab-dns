@@ -1,13 +1,11 @@
 - name: NGINX | start proxy container
   docker_container:
     name: nginx
-    image: jwilder/nginx:latest
+    image: nginx:latest
     ports: 
     - '80:80/tcp'
     volumes:
-    - /var/run/docker.sock:/tmp/docker.sock'
     restart_policy: unless-stopped
     recreate: yes
     state: started
   environment:
-    DEFAULT_HOST: "{{ ansible_hostname }}.lan.synchro.dev"

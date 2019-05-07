@@ -4,8 +4,8 @@
 - import_tasks: systemd-resolver.yml
   tags: [systemd]
 
-- import_tasks: docker.yml
-  tags: [docker]
+- import_tasks: pihole.yml
+  tags: [pihole]
 
 - import_tasks: nginx.yml
   tags: [nginx]

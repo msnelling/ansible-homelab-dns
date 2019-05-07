@@ -16,6 +16,7 @@
     owner: root
     group: root
     mode: 0644
+  when: false
 
 - name: Docker | start Pi-Hole container
   docker_container:
@@ -38,3 +39,4 @@
     DNS1: "{{ pihole_upstream_dns[0] }}"
     DNS2: "{{ pihole_upstream_dns[1] }}"
     VIRTUAL_HOST: "{{ ansible_hostname }}.lan.synchro.dev"
+    VIRTUAL_PORT: 80
