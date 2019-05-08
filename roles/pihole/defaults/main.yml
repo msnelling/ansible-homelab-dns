@@ -1,10 +1,12 @@
-pihole_user: pihole
-pihole_group: pihole
-pihole_config_path: /etc/pihole
-pihole_install_path: /opt/pihole
+pihole_config_base_path: /opt/pihole
+pihole_config_path: "{{ pihole_config_base_path }}/etc-pihole"
+pihole_admin_hostname: pihole
+pihole_admin_domain: example.com
 pihole_network_interface: eth0
 pihole_ipv4_address: 127.0.0.1/24
 pihole_ipv6_address: ::1
 pihole_upstream_dns:
 - "9.9.9.9"
 - "2620:fe::fe"
+
+dnsmasq_config_path: "{{ pihole_config_base_path }}/etc-dnsmasq.d"

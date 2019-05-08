@@ -6,13 +6,13 @@
     mode: 0755
     state: directory
   loop:
-  - /opt/pihole/etc-pihole
-  - /opt/pihole/etc-dnsmasq.d
+  - "{{ pihole_config_path }}"
+  - "{{ dnsmasq_config_path }}"
 
 - name: Docker | create dnsmasq config
   template:
     src: 99-local.conf.j2
-    dest: /opt/pihole/etc-dnsmasq.d/99-local.conf
+    dest: "{{ dnsmasq_config_path }}/99-local.conf"
     owner: root
     group: root
     mode: 0644
@@ -24,10 +24,11 @@
     hostname: "{{ ansible_hostname }}"
     image: pihole/pihole:latest
     ports: 
+    - '53:53/tcp'
     - '53:53/udp'
     volumes:
-    - '/opt/pihole/etc-pihole/:/etc/pihole/'
-    - '/opt/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/'
+    - "{{ pihole_config_path }}/:/etc/pihole/"
+    - "{{ dnsmasq_config_path }}/:/etc/dnsmasq.d/"
     dns_servers:
     - 127.0.0.1
     - 8.8.8.8
@@ -38,5 +39,5 @@
     TZ: 'Europe/London'
     DNS1: "{{ pihole_upstream_dns[0] }}"
     DNS2: "{{ pihole_upstream_dns[1] }}"
-    VIRTUAL_HOST: "{{ ansible_hostname }}.lan.synchro.dev"
+    VIRTUAL_HOST: "{{ ansible_hostname }}.{{ pihole_admin_domain }}"
     VIRTUAL_PORT: 80
