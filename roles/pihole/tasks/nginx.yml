@@ -4,7 +4,9 @@
     image: nginx:latest
     ports: 
     - '80:80/tcp'
-    volumes:
+    volumes: "{{ nginx_config_mounts }}"
+    links:
+    - pihole
     restart_policy: unless-stopped
     recreate: yes
     state: started

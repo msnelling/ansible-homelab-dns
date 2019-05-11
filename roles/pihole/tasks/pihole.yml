@@ -39,5 +39,17 @@
     TZ: 'Europe/London'
     DNS1: "{{ pihole_upstream_dns[0] }}"
     DNS2: "{{ pihole_upstream_dns[1] }}"
-    VIRTUAL_HOST: "{{ ansible_hostname }}.{{ pihole_admin_domain }}"
+    VIRTUAL_HOST: "{{ pihole_admin_servername }}"
     VIRTUAL_PORT: 80
+
+- template:
+    src: nginx-pihole.conf.j2
+    dest: "{{ nginx_config_path }}/pihole.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- set_fact:
+    nginx_config_mounts: "{{ nginx_config_mounts + [nginx_config_path + '/pihole.conf:/etc/nginx/conf.d/pihole.conf'] }}"
+- debug:
+    msg: "{{ nginx_config_mounts }}"
