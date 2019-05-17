@@ -9,6 +9,14 @@
   - "{{ pihole_config_path }}"
   - "{{ dnsmasq_config_path }}"
 
+- name: Docker | create Pi-Hole local.list
+  template:
+    src: local.list.j2
+    dest: "{{ pihole_config_path }}/local.list"
+    owner: root
+    group: root
+    mode: 0644
+
 - name: Docker | create dnsmasq config
   template:
     src: 99-local.conf.j2

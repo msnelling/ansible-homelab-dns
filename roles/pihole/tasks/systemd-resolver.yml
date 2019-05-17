@@ -1,13 +1,22 @@
-- name: systemd-resolver | disable local resolver
-  lineinfile: 
-    dest: /etc/systemd/resolved.conf
-    regexp: "DNSStubListener"
-    line: "DNSStubListener=no"
-    state: present
-  register: systemd_resolver
+- name: resolv.conf | disconnect from systemd-resolved
+  file:
+    src: /run/resolvconf/resolv.conf
+    dest: /etc/resolv.conf
+    state: link
 
-- name: systemd-resolver | restart
+- name: resolv.conf | set local resolver
+  file: 
+    path: /etc/resolvconf/resolv.conf.d/base
+    content: |
+      nameserver 127.0.0.1
+  register: resolvconf
+
+- name: resolv.conf | update
+  shell: resolvconf --enable-updates && resolvconf -u
+  when: resolvconf.changed
+
+- name: systemd-resolved | stop and disable stub resolver
   service: 
-    name: systemd-resolver
-    state: restarted
-  when: systemd_resolver.changed
+    name: systemd-resolved
+    enabled: no
+    state: stopped

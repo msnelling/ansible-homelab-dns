@@ -14,13 +14,6 @@
       user_ssh_authorized_keys: "{{ my_ssh_authorized_keys }}"
     tags: [base]
 
-- hosts: powerdns
-  become: true
-  tasks:
-  - import_role:
-      name: powerdns
-    tags: [powerdns]
-
 - hosts: pihole
   become: true
   tasks:
