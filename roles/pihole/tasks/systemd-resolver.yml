@@ -1,22 +1,48 @@
+- name: resolv.conf | install resolvconf package
+  package:
+    name: resolvconf
+    state: latest
+
 - name: resolv.conf | disconnect from systemd-resolved
   file:
     src: /run/resolvconf/resolv.conf
     dest: /etc/resolv.conf
     state: link
+    force: yes
+    owner: root
+    group: root
 
 - name: resolv.conf | set local resolver
-  file: 
-    path: /etc/resolvconf/resolv.conf.d/base
+  copy: 
+    dest: /etc/resolvconf/resolv.conf.d/base
     content: |
-      nameserver 127.0.0.1
+      nameserver 1.1.1.1
   register: resolvconf
-
-- name: resolv.conf | update
-  shell: resolvconf --enable-updates && resolvconf -u
-  when: resolvconf.changed
 
 - name: systemd-resolved | stop and disable stub resolver
   service: 
     name: systemd-resolved
     enabled: no
     state: stopped
+
+- name: resolv.conf | update
+  shell: resolvconf --enable-updates && resolvconf -u
+  when: resolvconf.changed
+
+- name: resolv.conf | restart resolvconf
+  service:
+    name: resolvconf
+    state: restarted
+  when: resolvconf.changed
+
+- name: restart host
+  shell: shutdown -r +1 'Ansible Reboot triggered'
+  async: 0
+  poll: 0
+  failed_when: false
+  when: false
+
+- name: wait for system
+  wait_for_connection:
+    delay: 10
+    timeout: 600

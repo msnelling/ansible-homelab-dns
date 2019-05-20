@@ -1,0 +1,5 @@
+pihole_admin_domain: "svc.{{ base_domain }}"
+
+letsencrypt_domains:
+- "{{ pihole_admin_domain }}"
+- "*.{{ pihole_admin_domain }}"

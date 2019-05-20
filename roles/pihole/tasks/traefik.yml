@@ -1,0 +1,77 @@
+- name: Traefik | create config directories
+  file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+  loop:
+  - "{{ traefik_config_path }}"
+  - "{{ traefik_config_path }}/acme"
+  
+  - name: Traefik | create ACME config file
+    file:
+      path: "{{ traefik_config_path }}/acme/acme.json"
+      owner: root
+      group: root
+      state: touch
+
+  - name: Traefik | create Traefik config file
+    template:
+      src: traefik.toml.j2
+      dest: "{{ traefik_config_path }}/traefik.toml"
+      state: present
+
+- name: Traefik | install Traefik container
+  docker_service:
+    project_name: traefik
+    definition:
+      version: '2'
+      services:
+        traefik:
+          hostname: traefik
+          image: traefik:latest
+          container_name: traefik
+          restart: always
+          domainname: ${DOMAINNAME}
+          networks:
+          - default
+          - traefik_proxy
+          ports:
+          - "80:80"
+          - "443:443"
+          - "8080:8080"
+          environment:
+          - CF_API_EMAIL={{ cloudflare_api_email }}
+          - CF_API_KEY={{ cloudflare_api_key }}
+          labels:
+          - "traefik.enable=true"
+          - "traefik.backend=traefik"
+          - "traefik.frontend.rule=Host:traefik.${DOMAINNAME}"  
+          #- "traefik.frontend.rule=Host:${DOMAINNAME}; PathPrefixStrip: /traefik"
+          - "traefik.port=8080"
+          - "traefik.docker.network=traefik_proxy"
+          - "traefik.frontend.headers.SSLRedirect=true"
+          - "traefik.frontend.headers.STSSeconds=315360000"
+          - "traefik.frontend.headers.browserXSSFilter=true"
+          - "traefik.frontend.headers.contentTypeNosniff=true"
+          - "traefik.frontend.headers.forceSTSHeader=true"
+          - "traefik.frontend.headers.SSLHost=example.com"
+          - "traefik.frontend.headers.STSIncludeSubdomains=true"
+          - "traefik.frontend.headers.STSPreload=true"
+          - "traefik.frontend.headers.frameDeny=true"
+          #- "traefik.frontend.auth.basic.users=${HTTP_USERNAME}:${HTTP_PASSWORD}"
+          volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
+          - "{{ traefik_config_path }}:/etc/traefik"
+          - "{{ traefik_config_path }}/shared:/shared"
+      networks:
+        traefik_proxy:
+          external:
+            name: traefik_proxy
+        default:
+          driver: bridge
+  register: docker_compose_output
+
+- debug:
+    var: docker_compose_output
