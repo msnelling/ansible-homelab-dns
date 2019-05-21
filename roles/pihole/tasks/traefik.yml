@@ -1,3 +1,9 @@
+- name: Traefik | install pip packages
+  pip:
+    name: docker-compose
+    state: latest
+  when: false
+
 - name: Traefik | create config directories
   file:
     path: "{{ item }}"
@@ -9,21 +15,28 @@
   - "{{ traefik_config_path }}"
   - "{{ traefik_config_path }}/acme"
   
-  - name: Traefik | create ACME config file
-    file:
-      path: "{{ traefik_config_path }}/acme/acme.json"
-      owner: root
-      group: root
-      state: touch
+- name: Traefik | create ACME config file
+  file:
+    path: "{{ traefik_config_path }}/acme/acme.json"
+    owner: root
+    group: root
+    mode: 0600
+    state: touch
 
-  - name: Traefik | create Traefik config file
-    template:
-      src: traefik.toml.j2
-      dest: "{{ traefik_config_path }}/traefik.toml"
-      state: present
+- name: Traefik | create Traefik config file
+  template:
+    src: traefik.toml.j2
+    dest: "{{ traefik_config_path }}/traefik.toml"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Traefik | create traefik proxy network
+  docker_network:
+    name: traefik_proxy
 
 - name: Traefik | install Traefik container
-  docker_service:
+  docker_compose:
     project_name: traefik
     definition:
       version: '2'
@@ -71,6 +84,7 @@
             name: traefik_proxy
         default:
           driver: bridge
+    recreate: always
   register: docker_compose_output
 
 - debug:

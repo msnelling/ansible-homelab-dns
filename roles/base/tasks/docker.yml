@@ -9,11 +9,6 @@
   - software-properties-common
   - python3-pip
 
-- name: Docker install pip packages
-  pip:
-    name: docker-py
-    state: latest
-
 - name: Docker | add repository key
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
@@ -33,4 +28,12 @@
   - docker-ce
   - docker-ce-cli
   - containerd.io
+  - libffi-dev # req'd by docker-compose below
+
+- name: Docker install pip packages
+  pip:
+    name: "{{ item }}"
+    state: latest
+  loop:
+  - docker
   - docker-compose
