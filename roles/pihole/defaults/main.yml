@@ -1,8 +1,6 @@
 config_base_path: /opt/docker
 
 pihole_config_path: "{{ config_base_path }}/pihole"
-pihole_admin_servername: pihole.example.com
-pihole_network_interface: eth0
 pihole_ipv4_address: 127.0.0.1/24
 pihole_ipv6_address: ::1
 pihole_upstream_dns:
