@@ -55,37 +55,36 @@
           - "443:443"
           - "8080:8080"
           environment:
-          - CF_API_EMAIL={{ cloudflare_api_email }}
-          - CF_API_KEY={{ cloudflare_api_key }}
+          - CF_API_EMAIL=${CLOUDFLARE_EMAIL}
+          - CF_API_KEY=${CLOUDFLARE_API_KEY}
           labels:
-          - "traefik.enable=true"
-          - "traefik.backend=traefik"
-          - "traefik.frontend.rule=Host:traefik.${DOMAINNAME}"  
-          #- "traefik.frontend.rule=Host:${DOMAINNAME}; PathPrefixStrip: /traefik"
-          - "traefik.port=8080"
-          - "traefik.docker.network=traefik_proxy"
-          - "traefik.frontend.headers.SSLRedirect=true"
-          - "traefik.frontend.headers.STSSeconds=315360000"
-          - "traefik.frontend.headers.browserXSSFilter=true"
-          - "traefik.frontend.headers.contentTypeNosniff=true"
-          - "traefik.frontend.headers.forceSTSHeader=true"
-          - "traefik.frontend.headers.SSLHost=example.com"
-          - "traefik.frontend.headers.STSIncludeSubdomains=true"
-          - "traefik.frontend.headers.STSPreload=true"
-          - "traefik.frontend.headers.frameDeny=true"
-          #- "traefik.frontend.auth.basic.users=${HTTP_USERNAME}:${HTTP_PASSWORD}"
+            traefik.enable: "true"
+            traefik.backend: "traefik"
+            #traefik.frontend.rule: "Host:traefik.${DOMAINNAME}"  
+            traefik.frontend.rule: "Host:${DOMAINNAME}; PathPrefixStrip:/traefik"
+            traefik.port: "8080"
+            traefik.docker.network: "traefik_proxy"
+            traefik.frontend.headers.SSLRedirect: "true"
+            traefik.frontend.headers.browserXSSFilter: "true"
+            traefik.frontend.headers.contentTypeNosniff: "true"
+            traefik.frontend.headers.forceSTSHeader: "true"
+            traefik.frontend.headers.STSSeconds: "315360000"
+            traefik.frontend.headers.STSIncludeSubdomains: "true"
+            traefik.frontend.headers.STSPreload: "true"
+            traefik.frontend.headers.frameDeny: "true"
+            #traefik.frontend.auth.basic.users: "${HTTP_USERNAME}:${HTTP_PASSWORD}"
           volumes:
           - /var/run/docker.sock:/var/run/docker.sock:ro
-          - "{{ traefik_config_path }}:/etc/traefik"
-          - "{{ traefik_config_path }}/shared:/shared"
+          - ${USERDIR}:/etc/traefik
       networks:
         traefik_proxy:
           external:
             name: traefik_proxy
         default:
           driver: bridge
-    recreate: always
-  register: docker_compose_output
-
-- debug:
-    var: docker_compose_output
+    #recreate: always
+  environment:
+    USERDIR: "{{ traefik_config_path }}"
+    DOMAINNAME: "{{ pihole_admin_fqdn }}"
+    CLOUDFLARE_EMAIL: "{{ cloudflare_api_email }}"
+    CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"

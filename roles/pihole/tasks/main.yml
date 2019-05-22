@@ -4,8 +4,8 @@
 - import_tasks: systemd-resolver.yml
   tags: [systemd]
 
-- import_tasks: pihole.yml
-  tags: [pihole]
-
 - import_tasks: traefik.yml
   tags: [traefik]
+
+- import_tasks: pihole.yml
+  tags: [pihole]

@@ -12,9 +12,6 @@ pihole_upstream_dns:
 dnsmasq_overrides: []
 dnsmasq_config_path: "{{ config_base_path }}/dnsmasq.d"
 
-nginx_config_path: "{{ config_base_path }}/nginx"
-nginx_config_mounts: []
-
 traefik_config_path: "{{ config_base_path }}/traefik"
 
 letsencrypt_email: me@example.com

@@ -1,8 +1,6 @@
-#debug = true
-
-logLevel = "ERROR" #DEBUG, INFO, WARN, ERROR, FATAL, PANIC
-InsecureSkipVerify = true 
-defaultEntryPoints = ["https", "http"]
+logLevel = "WARN" #DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+InsecureSkipVerify = true
+defaultEntryPoints = ["http", "https"]
 
 # WEB interface of Traefik - it will show web page with overview of frontend and backend configurations 
 [api]
@@ -26,7 +24,7 @@ defaultEntryPoints = ["https", "http"]
 
 # Let's encrypt configuration
 [acme]
-email = "{{ letsencrypt_email }}" #any email id will work
+email = "{{ letsencrypt_email }}"
 storage="/etc/traefik/acme/acme.json"
 entryPoint = "https"
 acmeLogging=true 
