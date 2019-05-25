@@ -31,6 +31,7 @@
     name: pihole
     hostname: "{{ ansible_hostname }}"
     image: pihole/pihole:latest
+    pull: yes
     ports: 
     - '53:53/tcp'
     - '53:53/udp'
@@ -57,12 +58,11 @@
     dns_servers:
     - 127.0.0.1
     - 8.8.8.8
+    env:
+      TZ: 'Europe/London'
+      DNS1: "{{ pihole_upstream_dns[0] }}"
+      DNS2: "{{ pihole_upstream_dns[1] }}"
+      WEBPASSWORD: "{{ pihole_admin_password }}"
     restart_policy: unless-stopped
     recreate: yes
     state: started
-  environment:
-    TZ: 'Europe/London'
-    DNS1: "{{ pihole_upstream_dns[0] }}"
-    DNS2: "{{ pihole_upstream_dns[1] }}"
-    VIRTUAL_HOST: "{{ pihole_admin_fqdn }}"
-    VIRTUAL_PORT: 80

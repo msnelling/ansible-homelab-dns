@@ -1,4 +1,5 @@
 pihole_admin_domain: "svc.{{ base_domain }}"
+pihole_admin_password: "{{ vault_pihole_admin_password }}"
 
 letsencrypt_domains:
 - "{{ pihole_admin_domain }}"
