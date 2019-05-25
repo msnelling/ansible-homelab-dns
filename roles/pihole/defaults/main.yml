@@ -1,4 +1,4 @@
-config_base_path: /opt/docker
+config_base_path: /srv/docker
 
 pihole_config_path: "{{ config_base_path }}/pihole"
 pihole_ipv4_address: 127.0.0.1/24
