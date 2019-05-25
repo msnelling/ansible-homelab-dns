@@ -1,32 +1,68 @@
-- name: Install | download Pi-Hole installer
-  get_url:
-    url: https://install.pi-hole.net
-    dest: ~/install-pihole.sh
-    mode: 0740
-
-- name: Install | create Pi-Hole configuration directory
+- name: Pi-Hole | create Pi-hole config directories
   file:
-    name: "{{ pihole_config_path }}"
-    state: directory
-    owner: "{{ pihole_user }}"
-    group: "{{ pihole_group }}"
+    path: "{{ item }}"
+    owner: root
+    group: root
     mode: 0755
+    state: directory
+  loop:
+  - "{{ pihole_config_path }}"
+  - "{{ dnsmasq_config_path }}"
 
-- name: Install | create Pi-Hole configuration file
+- name: Pi-Hole | create Pi-Hole local.list
   template:
-    src: "setupVars.conf.j2"
-    dest: "{{ pihole_config_path }}/setupVars.conf"
+    src: local.list.j2
+    dest: "{{ pihole_config_path }}/local.list"
     owner: root
     group: root
     mode: 0644
 
-- name: Install | install Pi-Hole
-  shell: "~/install-pihole.sh --unattended"
-  register: install_pihole
+- name: Pi-Hole | create dnsmasq config
+  template:
+    src: 99-local.conf.j2
+    dest: "{{ dnsmasq_config_path }}/99-local.conf"
+    owner: root
+    group: root
+    mode: 0644
+  when: false
 
-- name: Install | set Pi-Hole to update every week
-  replace:
-    path: /etc/cron.d/pihole
-    regexp: '^#(.*updatePihole.*)$'
-    replace: '\1'
-    backup: yes
+- name: Pi-Hole | start Pi-Hole container
+  docker_container:
+    name: pihole
+    hostname: "{{ ansible_hostname }}"
+    image: pihole/pihole:latest
+    pull: yes
+    ports: 
+    - '53:53/tcp'
+    - '53:53/udp'
+    volumes:
+    - "{{ pihole_config_path }}/:/etc/pihole/"
+    - "{{ dnsmasq_config_path }}/:/etc/dnsmasq.d/"
+    networks_cli_compatible: yes # defaults to yes in Ansible 2.12
+    networks:
+    - name: traefik_proxy
+    labels:
+      traefik.enable: "true"
+      traefik.backend: "pihole"
+      traefik.frontend.rule: "Host:{{ pihole_admin_fqdn }}; PathPrefixStrip: /pihole; AddPrefix: /admin"
+      traefik.port: "80"
+      traefik.docker.network: "traefik_proxy"
+      traefik.frontend.headers.SSLRedirect: "true"
+      traefik.frontend.headers.frameDeny: "true"
+      traefik.frontend.headers.browserXSSFilter: "true"
+      traefik.frontend.headers.contentTypeNosniff: "true"
+      traefik.frontend.headers.forceSTSHeader: "true"
+      traefik.frontend.headers.STSSeconds: "315360000"
+      traefik.frontend.headers.STSIncludeSubdomains: "true"
+      traefik.frontend.headers.STSPreload: "true"
+    dns_servers:
+    - 127.0.0.1
+    - 8.8.8.8
+    env:
+      TZ: 'Europe/London'
+      DNS1: "{{ pihole_upstream_dns[0] }}"
+      DNS2: "{{ pihole_upstream_dns[1] }}"
+      WEBPASSWORD: "{{ pihole_admin_password }}"
+    restart_policy: unless-stopped
+    recreate: yes
+    state: started

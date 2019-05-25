@@ -1,3 +1,0 @@
-ansible_ssh_host: "{{ vault_ansible_ssh_host }}"
-ipv4_address: "{{ vault_ipv4_address }}"
-ipv6_address: "{{ vault_ipv6_address }}"

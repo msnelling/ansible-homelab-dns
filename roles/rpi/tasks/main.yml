@@ -9,11 +9,25 @@
   - path: /tmp
     opts: defaults,noatime,nosuid,size=100m
   - path: /var/tmp
-    opts: defaults,noatime,nosuid,size=30m
+    opts: defaults,noatime,nosuid,size=100m
   - path: /var/log
     opts: defaults,noatime,nosuid,mode=0755,size=100m
   - path: /var/run
     opts: defaults,noatime,nosuid,mode=0755,size=2m
   - path: /var/spool/mqueue
     opts: defaults,noatime,nosuid,mode=0700,gid=12,size=30m
-  notify: restart host
+  register: tmpfs
+
+- name: restart host
+  shell: shutdown -r +1 'Ansible Reboot triggered'
+  async: 0
+  poll: 0
+  failed_when: false
+  when: tmpfs.changed
+  register: restarted
+
+- name: wait for system restart
+  wait_for_connection:
+    delay: 10
+    timeout: 600
+  when: restarted.changed

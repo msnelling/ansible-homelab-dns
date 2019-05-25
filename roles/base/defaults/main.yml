@@ -1,5 +1,9 @@
 user_username: "{{ my_username }}"
 user_password: "{{ my_password }}"
-user_groups: []
+user_groups: [sudo, docker]
 user_ssh_authorized_keys: []
 user_default: ubuntu
+
+apt_arch:
+  x86_64: amd64
+  aarch64: arm64

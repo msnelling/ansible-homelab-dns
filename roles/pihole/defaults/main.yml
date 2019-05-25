@@ -1,12 +1,19 @@
-pihole_user: pihole
-pihole_group: pihole
-pihole_config_path: /etc/pihole
-pihole_install_path: /opt/pihole
-pihole_network_interface: eth0
+config_base_path: /opt/docker
+
+pihole_config_path: "{{ config_base_path }}/pihole"
 pihole_ipv4_address: 127.0.0.1/24
 pihole_ipv6_address: ::1
 pihole_upstream_dns:
 - "9.9.9.9"
-- "149.112.112.112"
 - "2620:fe::fe"
-- "2620:fe::9"
+
+dnsmasq_overrides: []
+dnsmasq_config_path: "{{ config_base_path }}/dnsmasq.d"
+
+traefik_config_path: "{{ config_base_path }}/traefik"
+
+letsencrypt_email: me@example.com
+letsencrypt_dns01_provider: cloudflare
+letsencrypt_domains:
+- 'example.com'
+- '*.example.com'
