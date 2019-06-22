@@ -1,0 +1,19 @@
+ansible_host: "{{ host_ipv4 }}"
+ansible_user: rancher
+
+host_ipv4: "{{ vault_host_ipv4 }}"
+host_ipv4_bits: "{{ vault_host_ipv4_bits }}"
+host_ipv6: "{{ vault_host_ipv4 }}"
+host_ipv6_bits: "{{ vault_host_ipv6_bits }}"
+
+vsphere_vm_name: IPA-Test
+vsphere_vm_datacenter: ha-datacenter
+vsphere_vm_folder: /{{ vsphere_vm_datacenter }}/vm/
+vsphere_vm_datastore: LocalNVMeDisk1
+vsphere_vm_cpus: 2
+vsphere_vm_memory_mb: 2048
+vsphere_vm_os_disk_gb: 8
+vsphere_vm_iso: "[NAS] Kits/ISO/rancheros-vmware-autoformat.iso"
+
+pihole_admin_hostname: "{{ vault_pihole_admin_hostname }}"
+pihole_admin_fqdn: "{{ pihole_admin_hostname }}.{{ pihole_admin_domain }}"

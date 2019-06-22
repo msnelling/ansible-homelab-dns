@@ -1,0 +1,84 @@
+---
+- hosts: vsphere
+  gather_facts: false
+  tasks:
+
+  - name: gracefully remove vm
+    vmware_guest:
+      hostname: "{{ vsphere_hostname }}"
+      port: "{{ vsphere_port }}"
+      username: "{{ vsphere_username }}"
+      password: "{{ vsphere_password }}"
+      validate_certs: no
+      name: "{{ vsphere_vm_name }}"
+      folder: "{{ vsphere_vm_folder }}"
+      state: "{{ item }}"
+      state_change_timeout: 30
+      force: yes
+    loop:
+      - shutdownguest
+      - absent
+    vars:
+      ansible_python_interpreter: /usr/local/bin/python3
+    delegate_to: localhost
+
+  - name: create VM
+    vmware_guest:
+      hostname: "{{ vsphere_hostname }}"
+      port: "{{ vsphere_port }}"
+      username: "{{ vsphere_username }}"
+      password: "{{ vsphere_password }}"
+      validate_certs: no
+      name: "{{ vsphere_vm_name }}"
+      folder: "{{ vsphere_vm_folder }}"
+      state: poweredon
+      guest_id: other4xLinux64Guest
+      customvalues:
+        - key: guestinfo.cloud-init.config.data
+          value: "{{ lookup('template', 'templates/cloud-init.yml.j2') | b64encode }}"
+        - key: guestinfo.cloud-init.data.encoding
+          value: base64
+      cdrom:
+        type: iso
+        iso_path: "{{ vsphere_vm_iso }}"
+      hardware:
+        num_cpus: "{{ vsphere_vm_cpus }}"
+        num_cpu_cores_per_socket: "{{ vsphere_vm_cpus }}"
+        memory_mb: "{{ vsphere_vm_memory_mb }}"
+        scsi: paravirtual
+        boot_firmware: bios
+      disk:
+        - datastore: "{{ vsphere_vm_datastore }}"
+          size_gb: "{{ vsphere_vm_os_disk_gb }}"
+          type: thin
+      networks:
+        - name: VM Network
+          device_type: vmxnet3 
+        - name: SAN
+          device_type: vmxnet3
+      wait_for_ip_address: yes
+    vars:
+      ansible_python_interpreter: /usr/local/bin/python3
+    delegate_to: localhost
+    register: ipa_vm
+
+  - name: wait 300 seconds for port 22 to become open and contain "OpenSSH"
+    wait_for:
+      port: 22
+      host: '{{ ansible_host }}'
+      search_regex: OpenSSH
+      delay: 10
+    delegate_to: localhost
+
+  - name: restart host
+    raw: sudo reboot
+    poll: 0
+    ignore_unreachable: yes
+    failed_when: false
+
+  - name: wait for system
+    wait_for_connection:
+      delay: 10
+      timeout: 600
+    vars:
+      ansible_python_interpreter: /usr/bin/python3

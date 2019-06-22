@@ -1,0 +1,31 @@
+#cloud-config
+
+ssh_authorized_keys:
+{% for key in my_ssh_authorized_keys %}
+  - {{ key }}
+{% endfor %}
+
+runcmd:
+  - apt update
+  - apt dist-upgrade -y
+  - apt install -y python3 python3-pip
+  - pip3 install docker-compose
+
+rancher:
+  console: ubuntu
+  network:
+    dns:
+      nameservers:
+        - 1.1.1.1
+        - 1.0.0.1
+        - 2606:4700:4700::1111
+        - 2606:4700:4700::1001
+    interfaces:
+      eth0:
+        dhcp: false
+        addresses:
+          - {{ host_ipv4 }}/{{ host_ipv4_bits }}
+          - {{ host_ipv6 }}/{{ host_ipv6_bits }}
+        gateway: {{ gateway_ipv4 }}
+        gateway_ipv6: {{ gateway_ipv6 }}
+        mtu: 1500

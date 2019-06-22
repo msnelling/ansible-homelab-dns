@@ -1,6 +1,0 @@
-ansible_ssh_host: "{{ vault_ansible_ssh_host }}"
-ansible_python_interpreter: /usr/bin/python3
-pihole_ipv4_address: "{{ vault_pihole_ipv4_address }}"
-pihole_ipv6_address: "{{ vault_pihole_ipv6_address }}"
-pihole_admin_hostname: "{{ vault_pihole_admin_hostname }}"
-pihole_admin_fqdn: "{{ pihole_admin_hostname }}.{{ pihole_admin_domain }}"
